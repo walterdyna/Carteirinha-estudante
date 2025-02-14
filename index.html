@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carteirinha Digital</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #a40000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+        .card {
+            width: 350px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        .header {
+            background: #a40000;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .profile {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f5f5f5;
+        }
+        .profile img {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .profile .info {
+            flex-grow: 1;
+        }
+        .profile .info h2 {
+            font-size: 14px;
+            margin: 0;
+        }
+        .details {
+            padding: 15px;
+        }
+        .details p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .details strong {
+            color: #a40000;
+        }
+        .qr-code {
+            text-align: center;
+            padding: 15px;
+        }
+        .qr-code img {
+            width: 100px;
+            height: 100px;
+        }
+        .formulario {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .formulario label {
+            font-weight: bold;
+        }
+        .formulario input {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 250px;
+        }
+        .botao {
+            background: #a40000;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .contador {
+            font-size: 14px;
+            margin-top: -15px;
+            text-align: center;
+            color: white;
+            background-color: black;
+            padding: 5px;
+            border-radius: 10px;
+        }
+    </style>
+    <script>
+        function atualizarCarteirinha() {
+            // Atualizando os campos da carteirinha com os valores dos inputs
+            document.getElementById("nome").innerText = document.getElementById("inputNome").value;
+            document.getElementById("matricula").innerText = document.getElementById("inputMatricula").value;
+            document.getElementById("curso").innerText = document.getElementById("inputCurso").value;
+            document.getElementById("nascimento").innerText = document.getElementById("inputNascimento").value;
+            document.getElementById("validade").innerText = document.getElementById("inputValidade").value;
+            document.getElementById("identidade").innerText = document.getElementById("inputIdentidade").value;
+            document.getElementById("cpf").innerText = document.getElementById("inputCpf").value;
+            document.getElementById("faculdade").innerText = document.getElementById("inputFaculdade").value;
+        }
+
+        function salvarImagem() {
+            html2canvas(document.querySelector(".card")).then(canvas => {
+                let link = document.createElement("a");
+                link.download = "carteirinha.png";
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }
+
+        function carregarImagem(event) {
+            let foto = document.getElementById("fotoPerfil");
+            let arquivo = event.target.files[0];
+            let leitor = new FileReader();
+            leitor.onload = function(e) {
+                foto.src = e.target.result;
+            }
+            leitor.readAsDataURL(arquivo);
+        }
+
+        function atualizarContador() {
+            const dataAtual = new Date();
+            const mesAtual = dataAtual.getMonth();
+            const anoAtual = dataAtual.getFullYear();
+            
+            const chaveData = 'dataUltimoAcesso';
+            const chaveContador = 'contadorAcessos';
+            
+            // Verificando se a data de último acesso já foi armazenada
+            const ultimoAcesso = localStorage.getItem(chaveData);
+            const contador = parseInt(localStorage.getItem(chaveContador)) || 0;
+            
+            if (!ultimoAcesso || new Date(ultimoAcesso).getMonth() !== mesAtual || new Date(ultimoAcesso).getFullYear() !== anoAtual) {
+                // Se o mês mudou, resetar o contador
+                localStorage.setItem(chaveData, dataAtual.toISOString());
+                localStorage.setItem(chaveContador, 1);  // Inicia com 1 acesso
+            } else {
+                // Caso contrário, incrementa o contador
+                localStorage.setItem(chaveContador, contador + 1);
+            }
+
+            // Atualiza a exibição do contador
+            document.getElementById('contador').innerText = `Esta página ajudou ${localStorage.getItem(chaveContador)} vezes.`;
+        }
+
+        // Chama a função para inicializar o contador ao carregar a página
+        window.onload = atualizarContador;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="card" id="carteirinha">
+            <div class="header">Carteirinha Digital</div>
+            <p id="faculdade">MULTIVIX</p>
+            <div class="profile">
+                <img id="fotoPerfil" src="" alt="Foto do Usuário">
+                <div class="info">
+                    <h2 id="nome">Walter Alexander Bastos Dyna</h2>
+                    <p>Matrícula: <strong id="matricula">2214046</strong></p>
+                </div>
+            </div>
+            <div class="details">
+                <p><strong>Curso:</strong> <span id="curso">Engenharia de Computação</span></p>
+                <p><strong>Data de Nascimento:</strong> <span id="nascimento">18/06/1983</span></p>
+                <p><strong>Validade:</strong> <span id="validade">31/07/2025</span></p>
+                <p><strong>Identidade:</strong> <span id="identidade">1959142 SPTC ES</span></p>
+                <p><strong>CPF:</strong> <span id="cpf">093.700.187-27</span></p>
+            </div>
+            <div class="qr-code">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=Carteirinha" alt="QR Code">
+            </div>
+            <button class="botao" onclick="salvarImagem()">Salvar como imagem</button>
+        </div>
+        <div class="formulario">
+            <label>Foto:</label>
+            <input type="file" accept="image/*" onchange="carregarImagem(event)">
+            <label>Nome:</label>
+            <input type="text" id="inputNome">
+            <label>Matrícula:</label>
+            <input type="text" id="inputMatricula">
+            <label>Faculdade:</label>
+            <input type="text" id="inputFaculdade">
+            <label>Curso:</label>
+            <input type="text" id="inputCurso">
+            <label>Data de Nascimento:</label>
+            <input type="text" id="inputNascimento">
+            <label>Validade:</label>
+            <input type="text" id="inputValidade">
+            <label>Identidade:</label>
+            <input type="text" id="inputIdentidade">
+            <label>CPF:</label>
+            <input type="text" id="inputCpf">
+            <button class="botao" onclick="atualizarCarteirinha()">Atualizar</button>
+        </div>
+    </div>
+    <div class="contador" id="contador"></div>
+</body>
+</html>
